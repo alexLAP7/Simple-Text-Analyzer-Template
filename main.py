@@ -7,6 +7,8 @@ import sys
 
 
 def process_russian_text(text, type_of_word_to_highlight='VERB'):
+    # check out the original source:
+    # https://github.com/natasha/natasha
     segmenter = Segmenter()
     emb = NewsEmbedding()
     morph_tagger = NewsMorphTagger(emb)
@@ -31,6 +33,7 @@ class AdvancedTextEditor(QtWidgets.QWidget):
         self.setLayout(self.qvboxLayout)
 
         self.text_edit = QtWidgets.QTextEdit()
+        self.text_edit.setAcceptRichText(False)
         self.toolbar = QToolBar()
         self.toolbar.setOrientation(QtCore.Qt.Horizontal)
 
@@ -214,17 +217,44 @@ class AdvancedTextEditor(QtWidgets.QWidget):
     def process_russian_text(self):
         list_of_all_words = self.text_edit.toPlainText()
 
-        # list_of_nouns = process_russian_text(list_of_all_words, type_of_word_to_highlight='NOUN')
-        list_of_verbs = process_russian_text(
-            list_of_all_words, type_of_word_to_highlight='VERB')
-        list_of_parts = process_russian_text(
+        # 'Noun' is a person, place, concept, or a thing
+        list_of_nouns = process_russian_text(
+            list_of_all_words, type_of_word_to_highlight='NOUN')
+
+        # 'Particle' is a word or a part of a word that
+        # has a grammatical purpose but often has little or no meaning
+        list_of_parts = process_russian_text(  # (e.g. in, up, off, over, ...)
             list_of_all_words, type_of_word_to_highlight='PART')
 
-        # self.highlight_list_of_words_by_color(list_of_nouns, QtGui.QBrush(QtGui.QColor("red")))
+        # 'Conjunction' is a word that connects two nouns or phrases
+        list_of_sconj = process_russian_text(  # (e.g. and, but, if, ...)
+            list_of_all_words, type_of_word_to_highlight='SCONJ')
+
+        # 'Pronoun' is a noun that substitutes for another noun
+        list_of_pronouns = process_russian_text(  # (e.g. he, she, it, ...)
+            list_of_all_words, type_of_word_to_highlight='PRON')
+
+        # 'Verb' is an action word or phrase
+        list_of_verbs = process_russian_text(
+            list_of_all_words, type_of_word_to_highlight='VERB')
+
+        # check out the original source:
+        # https://github.com/natasha/natasha/blob/master/natasha/morph/vocab.py
+
         self.highlight_list_of_words_by_color(
-            list_of_verbs, QtGui.QBrush(QtGui.QColor("yellow")))
+            list_of_nouns, QtGui.QBrush(QtGui.QColor("yellow")))
+
+        # self.highlight_list_of_words_by_color(
+        #     list_of_parts, QtGui.QBrush(QtGui.QColor("light blue")))
+
+        # self.highlight_list_of_words_by_color(
+        #     list_of_sconj, QtGui.QBrush(QtGui.QColor("orange")))
+
+        # self.highlight_list_of_words_by_color(
+        #     list_of_pronouns, QtGui.QBrush(QtGui.QColor("red")))
+
         self.highlight_list_of_words_by_color(
-            list_of_parts, QtGui.QBrush(QtGui.QColor("light green")))
+            list_of_verbs, QtGui.QBrush(QtGui.QColor("light green")))
 
     def merge_format_on_word_selection(self, color):
         cursor = self.text_edit.textCursor()
@@ -251,5 +281,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     advanced_text_editor = AdvancedTextEditor()
     advanced_text_editor.show()
-    advanced_text_editor.resize(900, 400)
+    advanced_text_editor.showMaximized()
+    # advanced_text_editor.resize(900, 400)
     sys.exit(app.exec_())
