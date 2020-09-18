@@ -44,7 +44,7 @@ class AdvancedTextEditor(QtWidgets.QWidget):
     def set_menubar(self):
         self.menu_file = self.menu.addMenu("File")
 
-        self.action_undo = self.menu_file.addAction("Open a text file")
+        self.action_undo = self.menu_file.addAction("Open file")
         self.action_undo.setStatusTip("Open file action")
         self.action_undo.triggered.connect(self.open_text_file)
 
@@ -79,11 +79,9 @@ class AdvancedTextEditor(QtWidgets.QWidget):
 
         self.menu_analyzer = self.menu.addMenu("Analyzer")
 
-        self.action_analyze_rus = self.menu_analyzer.addAction(
-            "Analyze selected russian sentences and highlight the structure")
-        self.action_analyze_rus.setStatusTip(
-            "Highlight the structure")
-        self.action_analyze_rus.triggered.connect(self.process_russian_text)
+        self.action_analyze = self.menu_analyzer.addAction(
+            "Analyze and highlight")
+        self.action_analyze.triggered.connect(self.process_russian_text)
 
     def set_toolbar(self):
         self.undo = QtWidgets.QAction(QtGui.QIcon(os.path.join(
@@ -217,24 +215,24 @@ class AdvancedTextEditor(QtWidgets.QWidget):
     def process_russian_text(self):
         list_of_all_words = self.text_edit.toPlainText()
 
-        # 'Noun' is a person, place, concept, or a thing
+        # 'Noun' (существительное), a person, place, concept, or a thing
         list_of_nouns = process_russian_text(
             list_of_all_words, type_of_word_to_highlight='NOUN')
 
-        # 'Particle' is a word or a part of a word that
+        # 'Particle' (частица), a word or a part of a word that
         # has a grammatical purpose but often has little or no meaning
         list_of_parts = process_russian_text(  # (e.g. in, up, off, over, ...)
             list_of_all_words, type_of_word_to_highlight='PART')
 
-        # 'Conjunction' is a word that connects two nouns or phrases
+        # 'Conjunction' (союз), a word that connects two nouns or phrases
         list_of_sconj = process_russian_text(  # (e.g. and, but, if, ...)
             list_of_all_words, type_of_word_to_highlight='SCONJ')
 
-        # 'Pronoun' is a noun that substitutes for another noun
+        # 'Pronoun' (местоимение), a word that can function as a noun phrase
         list_of_pronouns = process_russian_text(  # (e.g. he, she, it, ...)
             list_of_all_words, type_of_word_to_highlight='PRON')
 
-        # 'Verb' is an action word or phrase
+        # 'Verb' (глагол), an action word or phrase
         list_of_verbs = process_russian_text(
             list_of_all_words, type_of_word_to_highlight='VERB')
 
@@ -275,6 +273,7 @@ class AdvancedTextEditor(QtWidgets.QWidget):
     def highlight_list_of_words_by_color(self, list_of_words_to_highlight, color):
         for word in list_of_words_to_highlight:
             self.find_word_and_highlight_it(word, color)
+        self.text_edit.moveCursor(QtGui.QTextCursor.Start)
 
 
 if __name__ == '__main__':
